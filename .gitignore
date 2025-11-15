@@ -1,0 +1,14 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+/venv/
+.env
+.vscode/
+.idea/
+.DS_Store
+videos.json
+/youtube_manager.log
+.cache/
+/.pytest_cache

@@ -1,0 +1,2 @@
+# No runtime dependencies required for the basic CLI.
+# Add libraries like click, flask, pytest-cov, etc. as needed.
