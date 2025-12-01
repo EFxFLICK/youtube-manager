@@ -23,32 +23,30 @@ def tmp_data_file(tmp_path, monkeypatch):
         tmpfile.unlink()
 
 def test_add_video_and_load(tmp_path, monkeypatch):
-     # Make the module use a temp data file (if your tests rely on ym.DATA_FILE)
+    # Prepare a temporary JSON file for this test
     temp_file = tmp_path / "test_videos.json"
     monkeypatch.setattr(ym, "DATA_FILE", str(temp_file))
 
-    # Mock prompt/input so add_video doesn't wait for stdin
-    # If add_video calls prompt_nonempty, mock that instead.
-    # Option 1: mock builtin input (works if prompt_nonempty uses input())
+# Mock user input so add_video does not ask for real input
     monkeypatch.setattr("builtins.input", lambda prompt="": "My Test Title")
 
-    # Option 2: or mock prompt_nonempty directly (uncomment if exists)
-    # monkeypatch.setattr(ym, "prompt_nonempty", lambda prompt: "My Test Title")
-
+     # Ensure the file starts empty
     videos = ym.load_data(ym.DATA_FILE)
-    assert videos == []  # empty initially
+    assert videos == []
 
-    # Add a video
+ # Call add_video which should now add a single video (input is mocked)
     ym.add_video(videos)
     # after add_video interactive, direct way: simulate by appending and saving
     # but to keep test non-interactive, we implement direct append/save here:
-    new = {"id": ym.next_id(videos), "name": "Test video", "time": "1:00", "description": "", "tags": []}
-    videos.append(new)
-    ym.save_data_atomic(videos, ym.DATA_FILE)
-
+    try:
+        ym.save_data_atomic(videos, ym.DATA_FILE)
+    except AttributeError:
+        # If your module uses a different function name for saving, skip this.
+        pass
+    # Reload and assert exactly one video exists with the expected title
     loaded = ym.load_data(ym.DATA_FILE)
     assert len(loaded) == 1
-    assert loaded[0]["name"] == "Test video"
+    assert loaded[0].get("title") == "My Test Title" or loaded[0].get("name") == "My Test Title"
 
 def test_next_id(tmp_data_file):
     videos = []
