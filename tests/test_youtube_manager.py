@@ -22,7 +22,19 @@ def tmp_data_file(tmp_path, monkeypatch):
     if tmpfile.exists():
         tmpfile.unlink()
 
-def test_add_video_and_load(tmp_data_file):
+def test_add_video_and_load(tmp_path, monkeypatch):
+     # Make the module use a temp data file (if your tests rely on ym.DATA_FILE)
+    temp_file = tmp_path / "test_videos.json"
+    monkeypatch.setattr(ym, "DATA_FILE", str(temp_file))
+
+    # Mock prompt/input so add_video doesn't wait for stdin
+    # If add_video calls prompt_nonempty, mock that instead.
+    # Option 1: mock builtin input (works if prompt_nonempty uses input())
+    monkeypatch.setattr("builtins.input", lambda prompt="": "My Test Title")
+
+    # Option 2: or mock prompt_nonempty directly (uncomment if exists)
+    # monkeypatch.setattr(ym, "prompt_nonempty", lambda prompt: "My Test Title")
+
     videos = ym.load_data(ym.DATA_FILE)
     assert videos == []  # empty initially
 
