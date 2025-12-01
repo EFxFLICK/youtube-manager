@@ -1,5 +1,12 @@
-from youtube_manager import pytest, json, os, tempfile
+import pytest
+import json
+import os
+import tempfile
+
+# import the module under test
 import youtube_manager as ym
+# or import specific symbols you need, for example:
+# from youtube_manager import load_videos, save_videos, add_video
 
 @pytest.fixture
 def tmp_data_file(tmp_path, monkeypatch):
